@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMyShow Scraper RESTful API Hub</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-card: rgba(22, 27, 46, 0.7);
+            --bg-card-hover: rgba(30, 38, 64, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass-glow: rgba(248, 68, 100, 0.3);
+            --primary: #f84464;
+            --primary-glow: rgba(248, 68, 100, 0.4);
+            --primary-hover: #e03352;
+            --accent-purple: #8b5cf6;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            --code-bg: #0d1117;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(248, 68, 100, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Navbar */
+        header {
+            border-bottom: 1px solid var(--border-glass);
+            backdrop-filter: blur(16px);
+            background: rgba(11, 15, 25, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #d1d5db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(248, 68, 100, 0.15);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Container */
+        .main-layout {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Banner */
+        .hero {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent-purple));
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(to right, #ffffff, #f84464);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .pill-tags {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: #d1d5db;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* Tester Section */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: #d1d5db;
+        }
+
+        select, input {
+            width: 100%;
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-execute {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-execute:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        .endpoint-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Output Box */
+        .output-box {
+            background: var(--code-bg);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            padding: 1rem;
+            max-height: 520px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #eceff4;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-glass);
+            color: #d1d5db;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+        }
+
+        /* Movie Cards Grid */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .movie-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glass-glow);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #1f293d;
+        }
+
+        .movie-info {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .movie-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+            line-height: 1.3;
+        }
+
+        .movie-meta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 0.6rem;
+
+        }
+
+        .movie-rating {
+            color: #f59e0b;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .btn-view-st {
+            margin-top: auto;
+            background: rgba(248, 68, 100, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(248, 68, 100, 0.4);
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn-view-st:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="navbar">
+            <div class="logo-group">
+                <div class="logo-badge">BMS</div>
+                <div class="logo-text">BookMyShow Scraper REST API</div>
+            </div>
+            <div class="nav-links">
+                <a href="/docs" target="_blank" class="nav-btn">
+                    <i class="fa-solid fa-code"></i> OpenAPI / Swagger Docs
+                </a>
+                <a href="/redoc" target="_blank" class="nav-btn">
+                    <i class="fa-solid fa-book"></i> ReDoc Docs
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-layout">
+        
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1 class="hero-title">BookMyShow Scraper RESTful Service</h1>
+            <p class="hero-subtitle">
+                High-performance REST API extracting clean, strictly-typed JSON from BookMyShow. Strips all tracking telemetry, internal style objects, and ad scripts to deliver structured endpoints for Cities, Movies, Events, Synopsis, Cinema Venues & Showtimes.
+            </p>
+            <div class="pill-tags">
+                <span class="pill"><i class="fa-solid fa-bolt" style="color: var(--primary);"></i> Fast JSON Extraction</span>
+                <span class="pill"><i class="fa-solid fa-filter" style="color: #10b981;"></i> Clean & Filtered Payload</span>
+                <span class="pill"><i class="fa-solid fa-film" style="color: #3b82f6;"></i> Movies & Events</span>
+                <span class="pill"><i class="fa-solid fa-clock" style="color: #8b5cf6;"></i> Live Showtimes & Pricing</span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tester')">
+                <i class="fa-solid fa-vial"></i> REST API Tester
+            </button>
+            <button class="tab-btn" onclick="switchTab('explorer')">
+                <i class="fa-solid fa-grid-2"></i> Visual Movie Explorer
+            </button>
+        </div>
+
+        <!-- Tab 1: API Tester -->
+        <div id="tab-tester" class="grid-2">
+            
+            <!-- Controls Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Request Controls
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Endpoint</label>
+                    <select id="endpoint-select" onchange="updateFormFields()">
+                        <option value="movies">GET /api/v1/movies (Movie Listings)</option>
+                        <option value="cities">GET /api/v1/cities (Supported Cities)</option>
+                        <option value="showtimes">GET /api/v1/showtimes (Venues & Showtimes)</option>
+                        <option value="venues">GET /api/v1/venues/{code} (Cinema Venue Location & Geo Lat/Long)</option>
+                        <option value="details">GET /api/v1/movies/{code} (Movie Details)</option>
+                        <option value="events">GET /api/v1/events (Event Listings)</option>
+                        <option value="search">GET /api/v1/search (Search)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="group-city">
+                    <label>City Slug</label>
+                    <select id="input-city">
+                        <option value="mumbai" selected>Mumbai (mumbai)</option>
+                        <option value="national-capital-region-ncr">Delhi-NCR (national-capital-region-ncr)</option>
+                        <option value="bengaluru">Bengaluru (bengaluru)</option>
+                        <option value="hyderabad">Hyderabad (hyderabad)</option>
+                        <option value="chennai">Chennai (chennai)</option>
+                        <option value="pune">Pune (pune)</option>
+                        <option value="kolkata">Kolkata (kolkata)</option>
+                        <option value="ahmedabad">Ahmedabad (ahmedabad)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="group-code" style="display: none;">
+                    <label>Event Code / Venue Code</label>
+                    <input type="text" id="input-code" value="ET00378770" placeholder="Movie Code (ET00378770) or Venue Code (PCAN / CSWO)">
+                </div>
+
+                <div class="form-group" id="group-date" style="display: none;">
+                    <label>Date (Optional YYYYMMDD)</label>
+                    <input type="text" id="input-date" placeholder="e.g. 20260826">
+                </div>
+
+                <div class="form-group" id="group-query" style="display: none;">
+                    <label>Search Query</label>
+                    <input type="text" id="input-query" value="Toxic" placeholder="Search title e.g. Kalki">
+                </div>
+
+                <button class="btn-execute" onclick="executeApiCall()">
+                    <span id="btn-text"><i class="fa-solid fa-paper-plane"></i> Send Request</span>
+                </button>
+            </div>
+
+            <!-- Response Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-code" style="color: #10b981;"></i> Formatted JSON Response
+                    </div>
+                    <div>
+                        <span class="endpoint-badge" id="response-status">200 OK</span>
+                        <button class="copy-btn" onclick="copyResponse()"><i class="fa-solid fa-copy"></i> Copy JSON</button>
+                    </div>
+                </div>
+
+                <pre class="output-box" id="json-output">// Click "Send Request" to fetch live formatted JSON from API</pre>
+            </div>
+        </div>
+
+        <!-- Tab 2: Visual Movie Explorer -->
+        <div id="tab-explorer" style="display: none;">
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="flex-grow: 1;">
+                        <label>Select City for Visual Discovery</label>
+                        <select id="explorer-city" onchange="loadExplorerMovies()">
+                            <option value="mumbai" selected>Mumbai</option>
+                            <option value="national-capital-region-ncr">Delhi-NCR</option>
+                            <option value="bengaluru">Bengaluru</option>
+                            <option value="hyderabad">Hyderabad</option>
+                            <option value="chennai">Chennai</option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 1.3rem;">
+                        <button class="btn-execute" onclick="loadExplorerMovies()" style="padding: 0.65rem 1.5rem;">
+                            <i class="fa-solid fa-rotate"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="explorer-loader" style="text-align: center; padding: 3rem; display: none;">
+                <div class="loader" style="width: 32px; height: 32px; border-width: 3px;"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Fetching movies from BookMyShow API...</p>
+            </div>
+
+            <div class="movies-grid" id="movies-container">
+                <!-- Movie cards rendered dynamically -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            if (tab === 'tester') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.remove('active');
+                document.getElementById('tab-tester').style.display = 'grid';
+                document.getElementById('tab-explorer').style.display = 'none';
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+                document.getElementById('tab-tester').style.display = 'none';
+                document.getElementById('tab-explorer').style.display = 'block';
+                loadExplorerMovies();
+            }
+        }
+
+        function updateFormFields() {
+            const ep = document.getElementById('endpoint-select').value;
+            document.getElementById('group-city').style.display = (ep === 'cities') ? 'none' : 'block';
+            document.getElementById('group-code').style.display = (ep === 'showtimes' || ep === 'details' || ep === 'venues') ? 'block' : 'none';
+            document.getElementById('group-date').style.display = (ep === 'showtimes') ? 'block' : 'none';
+            document.getElementById('group-query').style.display = (ep === 'search') ? 'block' : 'none';
+
+            const codeInput = document.getElementById('input-code');
+            if (ep === 'venues') {
+                if (codeInput.value.startsWith('ET')) codeInput.value = 'PCAN';
+            } else if (ep === 'details' || ep === 'showtimes') {
+                if (!codeInput.value.startsWith('ET')) codeInput.value = 'ET00378770';
+            }
+        }
+
+
+        async function executeApiCall() {
+            const ep = document.getElementById('endpoint-select').value;
+            const city = document.getElementById('input-city').value;
+            const code = document.getElementById('input-code').value;
+            const date = document.getElementById('input-date').value;
+            const query = document.getElementById('input-query').value;
+
+            let url = '/api/v1/';
+            if (ep === 'movies') url += `movies?city=${city}`;
+            else if (ep === 'cities') url += `cities`;
+            else if (ep === 'events') url += `events?city=${city}`;
+            else if (ep === 'details') url += `movies/${code}?city=${city}`;
+            else if (ep === 'venues') url += `venues/${code}?city=${city}`;
+            else if (ep === 'showtimes') url += `showtimes?movie_code=${code}&city=${city}${date ? '&date='+date : ''}`;
+            else if (ep === 'search') url += `search?q=${encodeURIComponent(query)}&city=${city}`;
+
+            const outBox = document.getElementById('json-output');
+            const statusBadge = document.getElementById('response-status');
+            const btnText = document.getElementById('btn-text');
+
+            btnText.innerHTML = '<div class="loader"></div> Fetching...';
+            outBox.textContent = 'Fetching response from ' + url + ' ...';
+
+            try {
+                const res = await fetch(url);
+                statusBadge.textContent = `${res.status} ${res.statusText}`;
+                const data = await res.json();
+                outBox.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                statusBadge.textContent = 'Error';
+                outBox.textContent = 'Network or parsing error: ' + err.message;
+            } finally {
+                btnText.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Request';
+            }
+        }
+
+        function copyResponse() {
+            const text = document.getElementById('json-output').textContent;
+            navigator.clipboard.writeText(text);
+            alert('JSON copied to clipboard!');
+        }
+
+        async function loadExplorerMovies() {
+            const city = document.getElementById('explorer-city').value;
+            const loader = document.getElementById('explorer-loader');
+            const grid = document.getElementById('movies-container');
+
+            loader.style.display = 'block';
+            grid.innerHTML = '';
+
+            try {
+                const res = await fetch(`/api/v1/movies?city=${city}`);
+                const json = await res.json();
+                const movies = json.data || [];
+
+                if (movies.length === 0) {
+                    grid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">No movies found for this region.</p>';
+                    return;
+                }
+
+                movies.forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = 'movie-card';
+                    const img = m.poster_url || 'https://via.placeholder.com/300x450?text=No+Poster';
+                    card.innerHTML = `
+                        <img class="movie-poster" src="${img}" alt="${m.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                        <div class="movie-info">
+                            <div class="movie-title">${m.title}</div>
+                            <div class="movie-meta">${m.censor_rating || ''} • ${m.languages ? m.languages.join(', ') : ''}</div>
+                            <div class="movie-rating">
+                                <i class="fa-solid fa-star"></i> ${m.rating_score ? m.rating_score + '/10' : (m.rating_votes || 'Rating N/A')}
+                            </div>
+                            <button class="btn-view-st" onclick="testShowtimesForCode('${m.code}', '${city}')">
+                                View Showtimes
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (err) {
+                grid.innerHTML = `<p style="color: var(--primary); grid-column: 1/-1;">Failed to load movies: ${err.message}</p>`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function testShowtimesForCode(code, city) {
+            switchTab('tester');
+            document.getElementById('endpoint-select').value = 'showtimes';
+            document.getElementById('input-city').value = city;
+            document.getElementById('input-code').value = code;
+            updateFormFields();
+            executeApiCall();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            executeApiCall();
+        };
+    </script>
+</body>
+</html>
