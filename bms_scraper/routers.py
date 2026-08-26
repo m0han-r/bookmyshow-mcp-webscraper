@@ -100,9 +100,13 @@ async def get_showtimes(
     movie_code: str = Query(..., description="BookMyShow movie code (e.g. ET00378770) or full buy tickets URL"),
     city: str = Query("mumbai", description="Target city slug"),
     date: Optional[str] = Query(None, description="Show date in YYYYMMDD format (e.g. 20260826). Defaults to today."),
+    language: Optional[str] = Query(None, description="Language filter or 'all' to aggregate all languages (e.g. tamil, hindi, kannada, telugu, all)"),
+    format: Optional[str] = Query(None, description="Screen format filter (e.g. 2D, 3D, IMAX, 4DX, EPIQ, ICE)"),
 ):
     try:
-        showtimes = await scraper.async_get_showtimes(movie_code_or_url=movie_code, city=city, date=date)
+        showtimes = await scraper.async_get_showtimes(
+            movie_code_or_url=movie_code, city=city, date=date, language=language, format=format
+        )
         return ApiResponse(success=True, count=len(showtimes), data=showtimes)
     except Exception as e:
         return ApiResponse(success=False, count=0, data=[], error=str(e))

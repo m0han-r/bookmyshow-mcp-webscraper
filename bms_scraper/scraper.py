@@ -5,7 +5,9 @@ Handles network fetching (via requests Session + asyncio.to_thread) with headers
 
 import time
 import asyncio
-from typing import List, Optional, Dict, Any
+import re
+import urllib.parse
+from typing import List, Optional, Dict, Any, Tuple
 import requests
 
 from .config import CONFIG
@@ -20,6 +22,20 @@ from .models import (
 )
 from .parser import BMSParser
 
+
+CITY_PRIMARY_LANGUAGES = {
+    "chennai": "tamil",
+    "coimbatore": "tamil",
+    "madurai": "tamil",
+    "tiruchirappalli": "tamil",
+    "hyderabad": "telugu",
+    "vijayawada": "telugu",
+    "visakhapatnam": "telugu",
+    "kochi": "malayalam",
+    "trivandrum": "malayalam",
+    "thiruvananthapuram": "malayalam",
+    "kozhikode": "malayalam",
+}
 
 
 class BookMyShowScraper:
@@ -199,64 +215,207 @@ class BookMyShowScraper:
         except Exception:
             return MovieDetailsResponse(title="Unknown", code=movie_code)
 
+    # --- Showtimes Helpers ---
+
+    @staticmethod
+    def _normalize_date(date_str: Optional[str]) -> Optional[str]:
+        """Normalizes date strings to YYYYMMDD format without hyphens."""
+        if not date_str:
+            return None
+        cleaned = str(date_str).strip().replace("-", "").replace("/", "")
+        if re.match(r'^\d{8}$', cleaned):
+            return cleaned
+        return None
+
+    def _build_showtimes_url(
+        self, movie_code_or_url: str, city: str = "mumbai", date: Optional[str] = None
+    ) -> Tuple[str, str, Optional[str]]:
+        """
+        Builds clean BookMyShow buytickets/showtimes URL, extracting movie_code, city, and date.
+        Returns: (final_url, movie_code, target_date)
+        """
+        norm_date = self._normalize_date(date)
+        city_slug = city.lower().strip()
+
+        if movie_code_or_url.startswith("http"):
+            url_str = movie_code_or_url.strip()
+            parsed = urllib.parse.urlparse(url_str)
+
+            code_match = re.search(r'(ET\d+)', url_str)
+            movie_code = code_match.group(1) if code_match else "UNKNOWN"
+
+            city_match = re.search(r'/(?:movies|showtimes)-([^/]+)/', parsed.path)
+            if city_match:
+                city_slug = city_match.group(1).lower().strip()
+
+            path_parts = [p for p in parsed.path.split('/') if p]
+
+            existing_date_idx = -1
+            for idx, part in enumerate(path_parts):
+                if re.match(r'^\d{8}$', part):
+                    existing_date_idx = idx
+                    break
+
+            if norm_date:
+                target_date = norm_date
+                if existing_date_idx != -1:
+                    path_parts[existing_date_idx] = norm_date
+                else:
+                    path_parts.append(norm_date)
+            else:
+                target_date = path_parts[existing_date_idx] if existing_date_idx != -1 else None
+
+            new_path = "/" + "/".join(path_parts)
+            final_url = urllib.parse.urlunparse((
+                parsed.scheme,
+                parsed.netloc,
+                new_path,
+                parsed.params,
+                parsed.query,
+                parsed.fragment
+            ))
+            return final_url, movie_code, target_date
+        else:
+            movie_code = movie_code_or_url.strip()
+            base_path = f"{CONFIG.BASE_URL}/buytickets/showtimes-{city_slug}/movie-{city_slug}-{movie_code}-MT"
+            if norm_date:
+                final_url = f"{base_path}/{norm_date}"
+            else:
+                final_url = base_path
+            return final_url, movie_code, norm_date
+
     # --- Showtimes ---
 
     async def async_get_showtimes(
-        self, movie_code_or_url: str, city: str = "mumbai", date: Optional[str] = None
+        self,
+        movie_code_or_url: str,
+        city: str = "mumbai",
+        date: Optional[str] = None,
+        language: Optional[str] = None,
+        format: Optional[str] = None,
     ) -> List[CinemaVenueShowtimes]:
         """Scrapes cinema venues, formats, pricing, and showtimes for a movie."""
+        url, movie_code, target_date = self._build_showtimes_url(movie_code_or_url, city, date)
         city_slug = city.lower().strip()
-        import re
-
-        if "buytickets" in movie_code_or_url and movie_code_or_url.startswith("http"):
-            url = movie_code_or_url
-            code_match = re.search(r'(ET\d+)', url)
-            movie_code = code_match.group(1) if code_match else "UNKNOWN"
-        elif movie_code_or_url.startswith("http"):
-            code_match = re.search(r'(ET\d+)', movie_code_or_url)
-            movie_code = code_match.group(1) if code_match else "UNKNOWN"
-            url = f"{CONFIG.BASE_URL}/buytickets/showtimes-{city_slug}/movie-{city_slug}-{movie_code}-MT"
-        else:
-            movie_code = movie_code_or_url.strip()
-            url = f"{CONFIG.BASE_URL}/buytickets/showtimes-{city_slug}/movie-{city_slug}-{movie_code}-MT"
-
-        if date:
-            if not url.rstrip("/").endswith(str(date)):
-                url = f"{url.rstrip('/')}/{date}"
-
         try:
             html = await self._fetch_html_async(url)
             state = BMSParser.extract_initial_state(html)
-            return BMSParser.parse_showtimes(state, movie_code)
+            lang_map = BMSParser.extract_language_event_codes(state)
+
+            codes_to_fetch: set = set()
+            if language:
+                lang_low = language.lower().strip()
+                if lang_low == "all":
+                    for codes in lang_map.values():
+                        codes_to_fetch.update(codes)
+                elif lang_low in lang_map:
+                    codes_to_fetch.update(lang_map[lang_low])
+                else:
+                    codes_to_fetch.add(movie_code)
+            else:
+                primary = CITY_PRIMARY_LANGUAGES.get(city_slug)
+                if primary and primary in lang_map:
+                    codes_to_fetch.update(lang_map[primary])
+                else:
+                    codes_to_fetch.add(movie_code)
+
+            if not codes_to_fetch:
+                codes_to_fetch.add(movie_code)
+
+            venue_map: Dict[str, CinemaVenueShowtimes] = {}
+
+            parsed = BMSParser.parse_showtimes(state, movie_code, date=target_date, language=language, format=format)
+            for v in parsed:
+                venue_map[v.venue_code] = v
+
+            for code in codes_to_fetch:
+                if code == movie_code:
+                    continue
+                code_url, _, _ = self._build_showtimes_url(code, city_slug, date)
+                try:
+                    c_html = await self._fetch_html_async(code_url)
+                    c_state = BMSParser.extract_initial_state(c_html)
+                    c_parsed = BMSParser.parse_showtimes(c_state, code, date=target_date, language=language, format=format)
+                    for v in c_parsed:
+                        if v.venue_code not in venue_map:
+                            venue_map[v.venue_code] = v
+                        else:
+                            existing_st = venue_map[v.venue_code].showtimes
+                            seen_keys = {(st.show_time, st.format) for st in existing_st}
+                            for st in v.showtimes:
+                                if (st.show_time, st.format) not in seen_keys:
+                                    existing_st.append(st)
+                                    seen_keys.add((st.show_time, st.format))
+                except Exception:
+                    pass
+
+            return list(venue_map.values())
         except Exception:
             return []
 
     def get_showtimes(
-        self, movie_code_or_url: str, city: str = "mumbai", date: Optional[str] = None
+        self,
+        movie_code_or_url: str,
+        city: str = "mumbai",
+        date: Optional[str] = None,
+        language: Optional[str] = None,
+        format: Optional[str] = None,
     ) -> List[CinemaVenueShowtimes]:
+        url, movie_code, target_date = self._build_showtimes_url(movie_code_or_url, city, date)
         city_slug = city.lower().strip()
-        import re
-
-        if "buytickets" in movie_code_or_url and movie_code_or_url.startswith("http"):
-            url = movie_code_or_url
-            code_match = re.search(r'(ET\d+)', url)
-            movie_code = code_match.group(1) if code_match else "UNKNOWN"
-        elif movie_code_or_url.startswith("http"):
-            code_match = re.search(r'(ET\d+)', movie_code_or_url)
-            movie_code = code_match.group(1) if code_match else "UNKNOWN"
-            url = f"{CONFIG.BASE_URL}/buytickets/showtimes-{city_slug}/movie-{city_slug}-{movie_code}-MT"
-        else:
-            movie_code = movie_code_or_url.strip()
-            url = f"{CONFIG.BASE_URL}/buytickets/showtimes-{city_slug}/movie-{city_slug}-{movie_code}-MT"
-
-        if date:
-            if not url.rstrip("/").endswith(str(date)):
-                url = f"{url.rstrip('/')}/{date}"
-
         try:
             html = self._fetch_html_sync(url)
             state = BMSParser.extract_initial_state(html)
-            return BMSParser.parse_showtimes(state, movie_code)
+            lang_map = BMSParser.extract_language_event_codes(state)
+
+            codes_to_fetch: set = set()
+            if language:
+                lang_low = language.lower().strip()
+                if lang_low == "all":
+                    for codes in lang_map.values():
+                        codes_to_fetch.update(codes)
+                elif lang_low in lang_map:
+                    codes_to_fetch.update(lang_map[lang_low])
+                else:
+                    codes_to_fetch.add(movie_code)
+            else:
+                primary = CITY_PRIMARY_LANGUAGES.get(city_slug)
+                if primary and primary in lang_map:
+                    codes_to_fetch.update(lang_map[primary])
+                else:
+                    codes_to_fetch.add(movie_code)
+
+            if not codes_to_fetch:
+                codes_to_fetch.add(movie_code)
+
+            venue_map: Dict[str, CinemaVenueShowtimes] = {}
+
+            parsed = BMSParser.parse_showtimes(state, movie_code, date=target_date, language=language, format=format)
+            for v in parsed:
+                venue_map[v.venue_code] = v
+
+            for code in codes_to_fetch:
+                if code == movie_code:
+                    continue
+                code_url, _, _ = self._build_showtimes_url(code, city_slug, date)
+                try:
+                    c_html = self._fetch_html_sync(code_url)
+                    c_state = BMSParser.extract_initial_state(c_html)
+                    c_parsed = BMSParser.parse_showtimes(c_state, code, date=target_date, language=language, format=format)
+                    for v in c_parsed:
+                        if v.venue_code not in venue_map:
+                            venue_map[v.venue_code] = v
+                        else:
+                            existing_st = venue_map[v.venue_code].showtimes
+                            seen_keys = {(st.show_time, st.format) for st in existing_st}
+                            for st in v.showtimes:
+                                if (st.show_time, st.format) not in seen_keys:
+                                    existing_st.append(st)
+                                    seen_keys.add((st.show_time, st.format))
+                except Exception:
+                    pass
+
+            return list(venue_map.values())
         except Exception:
             return []
 

@@ -44,7 +44,7 @@ pip install -r requirements.txt
 | `GET /api/v1/movies` | `bms_get_movies` | `city, language, genre` | Active movie listings with language/genre filters |
 | `GET /api/v1/events` | `bms_get_events` | `city, category` | Live events, comedy shows, music concerts, and sports |
 | `GET /api/v1/movies/{code}` | `bms_get_movie_details` | `movie_code, city` | Synopsis, cast, crew, ratings, poster & trailer links |
-| `GET /api/v1/showtimes` | `bms_get_showtimes` | `movie_code, city, date` | Showtimes, screen formats (IMAX/3D/4DX), prices & seats |
+| `GET /api/v1/showtimes` | `bms_get_showtimes` | `movie_code, city, date, language, format` | Showtimes, screen formats (IMAX/3D/4DX), prices, seats & language filtering |
 | `GET /api/v1/venues/{code}` | `bms_get_venue_details` | `venue_code, city` | Cinema street address, exact latitude, longitude & facilities |
 | `GET /api/v1/search` | `bms_search` | `query, city` | Cross-search movies and live events |
 
@@ -200,8 +200,8 @@ movies = scraper.get_movies(city="mumbai", language="Hindi")
 venue = scraper.get_venue_details(venue_code_or_url="PCAN", city="chennai")
 print(f"📍 {venue.venue_name} - Lat: {venue.latitude}, Lon: {venue.longitude}")
 
-# Get showtimes
-showtimes = scraper.get_showtimes(movie_code_or_url="ET00378770", city="mumbai")
+# Get showtimes (supports language filters e.g. "tamil", "hindi", "all" and format filters e.g. "IMAX", "2D")
+showtimes = scraper.get_showtimes(movie_code_or_url="ET00378770", city="chennai", date="20260827", language="tamil", format="2D")
 ```
 
 ---
@@ -219,6 +219,9 @@ uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli 
 
 # Scrape movies in Bengaluru and export to Excel
 uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli movies --city bengaluru --language Hindi --export xlsx
+
+# Scrape showtimes in Chennai for Tamil language with date and export to JSON
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli showtimes --code ET00378770 --city chennai --date 20260827 --language tamil --export json
 ```
 
 </details>
@@ -232,6 +235,9 @@ uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli 
 
 # Scrape movies in Bengaluru and export to Excel
 uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli movies --city bengaluru --language Hindi --export xlsx
+
+# Scrape showtimes in Chennai for Tamil language with date and export to JSON
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli showtimes --code ET00378770 --city chennai --date 20260827 --language tamil --export json
 ```
 
 </details>
@@ -245,6 +251,9 @@ python -m bms_scraper.cli cities --popular
 
 # Scrape movies in Bengaluru and export to Excel
 python -m bms_scraper.cli movies --city bengaluru --language Hindi --export xlsx
+
+# Scrape showtimes with language filter
+python -m bms_scraper.cli showtimes --code ET00378770 --city chennai --date 20260827 --language tamil --format 2D
 ```
 
 </details>

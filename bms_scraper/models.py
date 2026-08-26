@@ -75,6 +75,7 @@ class CinemaVenueShowtimes(BaseModel):
     address_info: Optional[str] = Field(None, description="Sub-location / address excerpt")
     distance_km: Optional[float] = Field(None, description="Distance if geolocation was provided")
     is_m_ticket: bool = Field(True, description="M-ticket supported at venue")
+    date: Optional[str] = Field(None, description="Show date in YYYYMMDD format (e.g. 20260828)")
     showtimes: List[ShowtimeItem] = Field(default_factory=list, description="List of available showtimes")
 
 class VenueDetailsResponse(BaseModel):

@@ -492,7 +492,52 @@ class BMSParser:
         )
 
     @staticmethod
-    def parse_showtimes(state_data: Dict[str, Any], movie_code: str) -> List[CinemaVenueShowtimes]:
+    def extract_language_event_codes(state_data: Dict[str, Any]) -> Dict[str, List[str]]:
+        """Extracts a mapping of lowercased language name -> list of event codes from format-selector widgets."""
+        lang_map: Dict[str, List[str]] = {}
+        if not state_data:
+            return lang_map
+
+        st_api = state_data.get("showtimesFunctionalApi", {})
+        queries = st_api.get("queries", {})
+
+        for qk, qv in queries.items():
+            if "fetchPrimaryDynamic" not in qk or not isinstance(qv, dict):
+                continue
+            q_data = qv.get("data", {}).get("data", {})
+            if not isinstance(q_data, dict):
+                continue
+            fmt_sel = q_data.get("bottomSheetData", {}).get("format-selector", {})
+            widgets = fmt_sel.get("widgets", [])
+            for w in widgets:
+                if not isinstance(w, dict):
+                    continue
+                lang = w.get("text", "").strip()
+                chips = w.get("data", [])
+                for chip in chips:
+                    if not isinstance(chip, dict):
+                        continue
+                    cta = chip.get("cta", {})
+                    add = cta.get("additionalData", {})
+                    code = add.get("eventCode") or add.get("refEventCode")
+                    if code and code != "*":
+                        item_lang = add.get("language") or lang
+                        if item_lang:
+                            key = item_lang.lower().strip()
+                            if key not in lang_map:
+                                lang_map[key] = []
+                            if code not in lang_map[key]:
+                                lang_map[key].append(code)
+        return lang_map
+
+    @staticmethod
+    def parse_showtimes(
+        state_data: Dict[str, Any],
+        movie_code: str,
+        date: Optional[str] = None,
+        language: Optional[str] = None,
+        format: Optional[str] = None,
+    ) -> List[CinemaVenueShowtimes]:
         """Extracts venue showtimes, formats, ticket pricing, and seat availability."""
         venues: List[CinemaVenueShowtimes] = []
 
@@ -509,6 +554,12 @@ class BMSParser:
             q_data = q_val.get("data", {}).get("data", {})
             if not isinstance(q_data, dict):
                 continue
+
+            extracted_date = date
+            meta_analytics = q_data.get("metadata", {}).get("analytics", {})
+            show_date_meta = meta_analytics.get("show_date", "").replace("-", "")
+            if show_date_meta:
+                extracted_date = show_date_meta
 
             showtime_widgets = q_data.get("showtimeWidgets", [])
             for widget in showtime_widgets:
@@ -609,6 +660,10 @@ class BMSParser:
                                 price_max = max(prices) if prices else None
 
                                 if show_time:
+                                    if format:
+                                        fmt_low = format.lower().strip()
+                                        if format_name and fmt_low not in format_name.lower():
+                                            continue
                                     showtimes_list.append(
                                         ShowtimeItem(
                                             show_time=show_time,
@@ -621,16 +676,18 @@ class BMSParser:
                                         )
                                     )
 
-                        venues.append(
-                            CinemaVenueShowtimes(
-                                venue_code=venue_code or "VENUE",
-                                venue_name=venue_name,
-                                address_info=None,
-                                distance_km=None,
-                                is_m_ticket=is_m_ticket,
-                                showtimes=showtimes_list,
+                        if showtimes_list:
+                            venues.append(
+                                CinemaVenueShowtimes(
+                                    venue_code=venue_code or "VENUE",
+                                    venue_name=venue_name,
+                                    address_info=None,
+                                    distance_km=None,
+                                    is_m_ticket=is_m_ticket,
+                                    date=extracted_date,
+                                    showtimes=showtimes_list,
+                                )
                             )
-                        )
 
         return venues
 

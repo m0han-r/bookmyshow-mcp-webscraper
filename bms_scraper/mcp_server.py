@@ -102,6 +102,8 @@ async def bms_get_showtimes(
     movie_code: str,
     city: str = "mumbai",
     date: Optional[str] = None,
+    language: Optional[str] = None,
+    format: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     Get Cinema Venues & Showtimes
@@ -111,10 +113,14 @@ async def bms_get_showtimes(
 
     Args:
         movie_code: Movie event code (e.g. 'ET00378770') or full BookMyShow buy tickets URL.
-        city: City slug (e.g. 'mumbai', 'bengaluru').
-        date: Show date in YYYYMMDD format (e.g. '20260826'). Defaults to current date.
+        city: City slug (e.g. 'mumbai', 'chennai', 'bengaluru').
+        date: Show date in YYYYMMDD format (e.g. '20260826') or YYYY-MM-DD. Defaults to current date.
+        language: Language filter or 'all' to aggregate all languages (e.g. 'tamil', 'hindi', 'kannada', 'telugu', 'all').
+        format: Screen format filter (e.g. '2D', '3D', 'IMAX', '4DX', 'EPIQ', 'ICE').
     """
-    venues = await scraper.async_get_showtimes(movie_code_or_url=movie_code, city=city, date=date)
+    venues = await scraper.async_get_showtimes(
+        movie_code_or_url=movie_code, city=city, date=date, language=language, format=format
+    )
     return [v.model_dump() for v in venues]
 
 

@@ -40,7 +40,9 @@ def main():
     showtimes_parser = subparsers.add_parser("showtimes", help="Scrape cinema venues & showtimes")
     showtimes_parser.add_argument("--code", required=True, help="Movie Code or Buy Tickets URL")
     showtimes_parser.add_argument("--city", default="mumbai", help="City slug")
-    showtimes_parser.add_argument("--date", help="Date in YYYYMMDD format")
+    showtimes_parser.add_argument("--date", help="Date in YYYYMMDD or YYYY-MM-DD format")
+    showtimes_parser.add_argument("--language", help="Language filter or 'all' to aggregate all languages (e.g. tamil, hindi, kannada, all)")
+    showtimes_parser.add_argument("--format", help="Screen format filter (e.g. 2D, 3D, IMAX, 4DX, EPIQ)")
     showtimes_parser.add_argument("--export", choices=["json", "csv", "xlsx"], help="Export output format")
 
     # Search Command
@@ -124,7 +126,9 @@ def main():
 
     elif args.command == "showtimes":
         console.print(f"[bold cyan]Fetching showtimes for {args.code} in {args.city}...[/bold cyan]")
-        showtimes = scraper.get_showtimes(args.code, city=args.city, date=args.date)
+        showtimes = scraper.get_showtimes(
+            args.code, city=args.city, date=args.date, language=args.language, format=args.format
+        )
 
         for venue in showtimes:
             console.print(f"\n[bold green]📍 {venue.venue_name}[/bold green] ([cyan]{venue.venue_code}[/cyan])")
