@@ -25,34 +25,8 @@ A high-performance Python web scraper, RESTful API server, Model Context Protoco
 
 ---
 
-## 📁 Project Structure
-
-```
-bookmyshow-mcp-webscraper/
-├── bms_scraper/             # Core Python Package
-│   ├── __init__.py          # Package exports & versioning
-│   ├── cli.py               # Command Line Interface (rich + argparse)
-│   ├── config.py            # Configuration settings & headers
-│   ├── exporter.py          # Data Exporter (JSON, CSV, Excel)
-│   ├── mcp_server.py        # FastMCP / MCPServer tool definitions
-│   ├── models.py            # Pydantic schema models
-│   ├── parser.py            # HTML & Next.js state data parser
-│   ├── routers.py           # FastAPI REST API router (/api/v1)
-│   └── scraper.py           # Core BookMyShow Scraper Client (Sync/Async)
-├── static/                  # Web Dashboard static files
-│   └── index.html           # Single Page Application dashboard UI
-├── tests/                   # Test suite
-│   ├── test_api.py          # FastAPI endpoint integration tests
-│   ├── test_mcp.py          # MCP server tool tests
-│   └── test_scraper.py      # Parser and Scraper unit tests
-├── main.py                  # FastAPI server entry point
-├── mcp_server.py            # MCP server entry point script
-└── README.md                # Documentation
-```
-
----
-
 ## 🚀 Quickstart & Installation
+
 
 ### 1. Clone Repository
 
