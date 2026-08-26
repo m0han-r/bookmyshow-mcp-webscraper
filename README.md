@@ -6,22 +6,24 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#-running-tests)
 
-A high-performance Python web scraper, RESTful API server, Model Context Protocol (MCP) server, CLI tool, and interactive web dashboard for [BookMyShow](https://in.bookmyshow.com). Effortlessly extract real-time movie listings, cinema showtimes, ticket pricing, seating availability, event schedules, and rich movie metadata into structured JSON, CSV, or Excel formats.
+A Python scraper and API wrapper for [BookMyShow](https://in.bookmyshow.com) that extracts movie listings, theater showtimes, ticket prices, and venue location details (including GPS latitude and longitude).
+
+It packages everything into a **FastAPI REST server**, **MCP tools** (for AI assistants like Claude or Cursor), a **CLI tool**, and a **built-in web dashboard**.
 
 ---
 
 ## ✨ Features
 
-- 🤖 **Model Context Protocol (MCP) Integration**: Native MCP server over stdio, enabling AI assistants (Claude, Antigravity, Cursor) to inspect movies, showtimes, and book seats seamlessly.
-- 🏙️ **Multi-City & Region Support**: Fetch movies, events, and venues across all supported Indian cities (Mumbai, Delhi-NCR, Bengaluru, Hyderabad, Chennai, Pune, etc.).
-- 🎟️ **Real-Time Showtimes & Pricing**: Extract cinema venues, showtimes, screen formats (2D, 3D, IMAX, 4DX), ticket price ranges, and seat availability status (`AVAILABLE`, `FAST_FILLING`, `SOLD_OUT`).
-- 🎬 **Comprehensive Movie Metadata**: Detailed synopsis, cast & crew profiles, censor ratings, languages, genres, poster/banner images, and trailer video links.
-- 📍 **Venue Geo Coordinates**: Extract cinema hall street addresses, exact latitude, longitude, and available amenities.
-- ⚡ **Sync & Async Python API**: Built-in support for both synchronous and asynchronous Python code (`asyncio`) with response caching (5-minute default TTL).
-- 🚀 **FastAPI REST API**: Fully interactive Swagger (`/docs`) API endpoints for seamless web and mobile backend integration.
-- 💻 **Rich CLI Interface**: Sleek terminal UI powered by `rich` supporting search, listings, details, and automatic exports.
-- 📊 **Multi-Format Data Exporter**: Export scraped data directly to **JSON**, **CSV**, or **Excel (`.xlsx`)** files.
-- 🌐 **Web Dashboard UI**: Embedded frontend dashboard to visually explore active movies, events, and showtimes.
+- **Lists Movies & Events**: Gets active or upcoming movie listings across Indian cities (Mumbai, Delhi-NCR, Bengaluru, Chennai, etc.), with filters for language and genre.
+- **Fetches Showtimes & Pricing**: Pulls cinema showtimes, screen formats (2D, 3D, IMAX, 4DX), ticket price ranges (in ₹), and seat availability.
+- **Extracts Venue Locations & Lat/Long**: Pulls theater street addresses, exact latitude and longitude coordinates, and venue amenities (parking, food court, M-ticket entry).
+- **Gets Movie Synopsis & Trailers**: Retrieves plot summaries, cast and crew info, ratings, posters, and YouTube trailer links.
+- **Runs as an MCP Server**: Works out-of-the-box with AI tools (Claude Desktop, Cursor, Antigravity) via `mcp_server.py` or `uvx`.
+- **FastAPI REST Server**: Interactive Swagger API docs (`/docs`).
+- **Terminal CLI**: Terminal interface for search, listings, and exports.
+- **Exports to Files**: Exports scraped data to JSON, CSV, or Excel (`.xlsx`).
+- **Web Dashboard**: Simple light-theme dashboard to browse movies and test endpoints.
+
 
 ---
 
