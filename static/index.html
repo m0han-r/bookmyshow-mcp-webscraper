@@ -3,33 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookMyShow MCP Webscraper RESTful Hub</title>
-
-
+    <title>BookMyShow MCP Webscraper</title>
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <style>
         :root {
-            --bg-dark: #0b0f19;
-            --bg-card: rgba(22, 27, 46, 0.7);
-            --bg-card-hover: rgba(30, 38, 64, 0.85);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --border-glass-glow: rgba(248, 68, 100, 0.3);
-            --primary: #f84464;
-            --primary-glow: rgba(248, 68, 100, 0.4);
-            --primary-hover: #e03352;
-            --accent-purple: #8b5cf6;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --text-dim: #6b7280;
-            --code-bg: #0d1117;
-            --success: #10b981;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #dc2626;
+            --primary-hover: #b91c1c;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
         }
 
         * {
@@ -39,30 +33,26 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
             min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(248, 68, 100, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
-            background-attachment: fixed;
         }
 
-        /* Navbar */
+        /* Header / Navbar */
         header {
-            border-bottom: 1px solid var(--border-glass);
-            backdrop-filter: blur(16px);
-            background: rgba(11, 15, 25, 0.8);
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .navbar {
-            max-width: 1280px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem 2rem;
+            padding: 0.85rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -71,205 +61,148 @@
         .logo-group {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.6rem;
         }
 
         .logo-badge {
-            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            background-color: var(--primary);
             color: white;
-            font-weight: 800;
-            font-size: 1.1rem;
-            padding: 0.4rem 0.75rem;
-            border-radius: 8px;
-            box-shadow: 0 0 15px var(--primary-glow);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.55rem;
+            border-radius: 4px;
         }
 
         .logo-text {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            background: linear-gradient(to right, #ffffff, #d1d5db);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-color);
         }
 
         .nav-links {
             display: flex;
-            gap: 1rem;
-            align-items: center;
+            gap: 0.75rem;
         }
 
         .nav-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            color: var(--text-main);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-            display: flex;
+            font-size: 0.85rem;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            transition: all 0.15s ease;
         }
 
         .nav-btn:hover {
-            background: rgba(248, 68, 100, 0.15);
-            border-color: var(--primary);
-            color: white;
+            color: var(--text-color);
+            border-color: #cbd5e1;
+            background-color: #f1f5f9;
         }
 
         /* Container */
-        .main-layout {
-            max-width: 1280px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        /* Hero Banner */
-        .hero {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 2.5rem;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(12px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--accent-purple));
-        }
-
-        .hero-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 0.75rem;
-            background: linear-gradient(to right, #ffffff, #f84464);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-subtitle {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            max-width: 800px;
-            line-height: 1.6;
-        }
-
-        .pill-tags {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .pill {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glass);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.82rem;
-            color: #d1d5db;
+        .container {
+            max-width: 1200px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
         }
 
         /* Tabs */
         .tabs {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-glass);
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.5rem;
         }
 
         .tab-btn {
-            background: transparent;
+            background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            display: flex;
+            border-radius: 6px;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px var(--primary-glow);
+            background-color: #ffffff;
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
-        /* Tester Section */
+        /* Tester Grid */
         .grid-2 {
             display: grid;
-            grid-template-columns: 1fr 1.3fr;
-            gap: 1.5rem;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 1.25rem;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 850px) {
             .grid-2 {
                 grid-template-columns: 1fr;
             }
         }
 
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: 14px;
-            padding: 1.5rem;
-            backdrop-filter: blur(12px);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.2rem;
-
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .card-title {
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 0.9rem;
         }
 
         label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 0.4rem;
-            color: #d1d5db;
+            margin-bottom: 0.35rem;
+            color: #475569;
         }
 
         select, input {
             width: 100%;
-            background: rgba(13, 17, 23, 0.8);
-            border: 1px solid var(--border-glass);
-            color: var(--text-main);
-            padding: 0.65rem 0.85rem;
-            border-radius: 8px;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.55rem 0.75rem;
+            border-radius: 6px;
             font-family: inherit;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.15s;
         }
 
         select:focus, input:focus {
@@ -278,102 +211,98 @@
 
         .btn-execute {
             width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 0.75rem;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.95rem;
+            padding: 0.65rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.2s;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: background-color 0.15s;
         }
 
         .btn-execute:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px var(--primary-glow);
+            background-color: var(--primary-hover);
         }
 
-        .endpoint-badge {
-            display: inline-block;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            font-weight: 700;
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+        .status-badge {
             font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background-color: #dcfce7;
+            color: #166534;
         }
 
-        /* Output Box */
+        .copy-btn {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            color: #475569;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--text-color);
+        }
+
         .output-box {
-            background: var(--code-bg);
-            border: 1px solid var(--border-glass);
-            border-radius: 10px;
-            padding: 1rem;
-            max-height: 520px;
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.85rem;
+            max-height: 500px;
             overflow-y: auto;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: #eceff4;
-            line-height: 1.5;
+            font-size: 0.8rem;
+            color: var(--code-text);
+            line-height: 1.45;
             white-space: pre-wrap;
             word-break: break-all;
         }
 
-        .copy-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--border-glass);
-            color: #d1d5db;
-            padding: 0.35rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.18);
-            color: white;
-        }
-
-        /* Movie Cards Grid */
+        /* Movies Explorer Grid */
         .movies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.2rem;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
             margin-top: 1rem;
         }
 
         .movie-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: border-color 0.15s;
         }
 
         .movie-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-glass-glow);
+            border-color: #cbd5e1;
         }
 
         .movie-poster {
             width: 100%;
-            height: 300px;
+            height: 260px;
             object-fit: cover;
-            background: #1f293d;
+            background-color: #e2e8f0;
         }
 
         .movie-info {
-            padding: 1rem;
+            padding: 0.85rem;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -381,52 +310,51 @@
 
         .movie-title {
             font-weight: 700;
-            font-size: 1.05rem;
-            margin-bottom: 0.4rem;
-            line-height: 1.3;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.25;
         }
 
         .movie-meta {
             color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 0.6rem;
-
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .movie-rating {
-            color: #f59e0b;
-            font-weight: 700;
-            font-size: 0.85rem;
+            color: #d97706;
+            font-weight: 600;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
             margin-bottom: 0.6rem;
         }
 
         .btn-view-st {
             margin-top: auto;
-            background: rgba(248, 68, 100, 0.15);
+            background-color: #fef2f2;
             color: var(--primary);
-            border: 1px solid rgba(248, 68, 100, 0.4);
-            padding: 0.5rem;
-            border-radius: 6px;
+            border: 1px solid #fecaca;
+            padding: 0.4rem;
+            border-radius: 4px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s;
         }
 
         .btn-view-st:hover {
-            background: var(--primary);
+            background-color: var(--primary);
             color: white;
+            border-color: var(--primary);
         }
 
         .loader {
             display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.4);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 0.8s linear infinite;
@@ -448,32 +376,17 @@
             </div>
             <div class="nav-links">
                 <a href="/docs" target="_blank" class="nav-btn">
-                    <i class="fa-solid fa-code"></i> OpenAPI / Swagger Docs
+                    <i class="fa-solid fa-code"></i> Swagger /docs
                 </a>
                 <a href="/redoc" target="_blank" class="nav-btn">
-                    <i class="fa-solid fa-book"></i> ReDoc Docs
+                    <i class="fa-solid fa-book"></i> ReDoc
                 </a>
             </div>
         </div>
     </header>
 
     <!-- Main Container -->
-    <div class="main-layout">
-        
-        <!-- Hero Section -->
-        <div class="hero">
-            <h1 class="hero-title">BookMyShow MCP Webscraper Service</h1>
-
-            <p class="hero-subtitle">
-                High-performance REST API extracting clean, strictly-typed JSON from BookMyShow. Strips all tracking telemetry, internal style objects, and ad scripts to deliver structured endpoints for Cities, Movies, Events, Synopsis, Cinema Venues & Showtimes.
-            </p>
-            <div class="pill-tags">
-                <span class="pill"><i class="fa-solid fa-bolt" style="color: var(--primary);"></i> Fast JSON Extraction</span>
-                <span class="pill"><i class="fa-solid fa-filter" style="color: #10b981;"></i> Clean & Filtered Payload</span>
-                <span class="pill"><i class="fa-solid fa-film" style="color: #3b82f6;"></i> Movies & Events</span>
-                <span class="pill"><i class="fa-solid fa-clock" style="color: #8b5cf6;"></i> Live Showtimes & Pricing</span>
-            </div>
-        </div>
+    <div class="container">
 
         <!-- Navigation Tabs -->
         <div class="tabs">
@@ -481,7 +394,7 @@
                 <i class="fa-solid fa-vial"></i> REST API Tester
             </button>
             <button class="tab-btn" onclick="switchTab('explorer')">
-                <i class="fa-solid fa-grid-2"></i> Visual Movie Explorer
+                <i class="fa-solid fa-film"></i> Movie Explorer
             </button>
         </div>
 
@@ -492,18 +405,18 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Request Controls
+                        <i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Endpoint Controls
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Select Endpoint</label>
+                    <label>Endpoint</label>
                     <select id="endpoint-select" onchange="updateFormFields()">
                         <option value="movies">GET /api/v1/movies (Movie Listings)</option>
                         <option value="cities">GET /api/v1/cities (Supported Cities)</option>
                         <option value="showtimes">GET /api/v1/showtimes (Venues & Showtimes)</option>
-                        <option value="venues">GET /api/v1/venues/{code} (Cinema Venue Location & Geo Lat/Long)</option>
-                        <option value="details">GET /api/v1/movies/{code} (Movie Details)</option>
+                        <option value="venues">GET /api/v1/venues/{code} (Venue Location & Geo Coordinates)</option>
+                        <option value="details">GET /api/v1/movies/{code} (Movie Synopsis & Metadata)</option>
                         <option value="events">GET /api/v1/events (Event Listings)</option>
                         <option value="search">GET /api/v1/search (Search)</option>
                     </select>
@@ -524,18 +437,18 @@
                 </div>
 
                 <div class="form-group" id="group-code" style="display: none;">
-                    <label>Event Code / Venue Code</label>
-                    <input type="text" id="input-code" value="ET00378770" placeholder="Movie Code (ET00378770) or Venue Code (PCAN / CSWO)">
+                    <label>Movie Code / Venue Code</label>
+                    <input type="text" id="input-code" value="ET00378770" placeholder="e.g. ET00378770 or PCAN">
                 </div>
 
                 <div class="form-group" id="group-date" style="display: none;">
-                    <label>Date (Optional YYYYMMDD)</label>
+                    <label>Date (YYYYMMDD)</label>
                     <input type="text" id="input-date" placeholder="e.g. 20260826">
                 </div>
 
                 <div class="form-group" id="group-query" style="display: none;">
                     <label>Search Query</label>
-                    <input type="text" id="input-query" value="Toxic" placeholder="Search title e.g. Kalki">
+                    <input type="text" id="input-query" value="Toxic" placeholder="Search keyword">
                 </div>
 
                 <button class="btn-execute" onclick="executeApiCall()">
@@ -547,24 +460,24 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="fa-solid fa-code" style="color: #10b981;"></i> Formatted JSON Response
+                        <i class="fa-solid fa-code" style="color: #166534;"></i> Response JSON
                     </div>
                     <div>
-                        <span class="endpoint-badge" id="response-status">200 OK</span>
-                        <button class="copy-btn" onclick="copyResponse()"><i class="fa-solid fa-copy"></i> Copy JSON</button>
+                        <span class="status-badge" id="response-status">200 OK</span>
+                        <button class="copy-btn" onclick="copyResponse()"><i class="fa-solid fa-copy"></i> Copy</button>
                     </div>
                 </div>
 
-                <pre class="output-box" id="json-output">// Click "Send Request" to fetch live formatted JSON from API</pre>
+                <pre class="output-box" id="json-output">// Click "Send Request" to fetch live JSON payload</pre>
             </div>
         </div>
 
         <!-- Tab 2: Visual Movie Explorer -->
         <div id="tab-explorer" style="display: none;">
-            <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card" style="margin-bottom: 1.25rem;">
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <div style="flex-grow: 1;">
-                        <label>Select City for Visual Discovery</label>
+                        <label>Select City</label>
                         <select id="explorer-city" onchange="loadExplorerMovies()">
                             <option value="mumbai" selected>Mumbai</option>
                             <option value="national-capital-region-ncr">Delhi-NCR</option>
@@ -574,16 +487,16 @@
                         </select>
                     </div>
                     <div style="margin-top: 1.3rem;">
-                        <button class="btn-execute" onclick="loadExplorerMovies()" style="padding: 0.65rem 1.5rem;">
+                        <button class="btn-execute" onclick="loadExplorerMovies()" style="padding: 0.55rem 1.2rem;">
                             <i class="fa-solid fa-rotate"></i> Refresh
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div id="explorer-loader" style="text-align: center; padding: 3rem; display: none;">
-                <div class="loader" style="width: 32px; height: 32px; border-width: 3px;"></div>
-                <p style="margin-top: 1rem; color: var(--text-muted);">Fetching movies from BookMyShow API...</p>
+            <div id="explorer-loader" style="text-align: center; padding: 2rem; display: none;">
+                <div class="loader" style="width: 24px; height: 24px; border-color: var(--primary); border-top-color: transparent;"></div>
+                <p style="margin-top: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">Loading movies...</p>
             </div>
 
             <div class="movies-grid" id="movies-container">
@@ -623,7 +536,6 @@
                 if (!codeInput.value.startsWith('ET')) codeInput.value = 'ET00378770';
             }
         }
-
 
         async function executeApiCall() {
             const ep = document.getElementById('endpoint-select').value;
