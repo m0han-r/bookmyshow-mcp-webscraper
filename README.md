@@ -55,11 +55,11 @@ bookmyshow-mcp-webscraper/
 
 ## 🚀 Quickstart & Installation
 
-### 1. Prerequisites
+### 1. Clone Repository
 
-Ensure Python 3.9 or higher is installed:
 ```bash
-python --version
+git clone https://github.com/m0han-r/bookmyshow-mcp-webscraper.git
+cd bookmyshow-mcp-webscraper
 ```
 
 ### 2. Install Dependencies
@@ -68,6 +68,7 @@ Install the required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
+
 
 
 ---
@@ -99,7 +100,7 @@ Run the server over stdio:
 python mcp_server.py
 
 # Or using uvx directly from Git repository:
-uvx --from git+https://github.com/<your-username>/bookmyshow-mcp-webscraper.git mcp_server.py
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git mcp_server.py
 ```
 
 ### Recommended MCP Client Configuration (`uvx`)
@@ -113,7 +114,7 @@ Add Option A to your MCP client configuration file (`claude_desktop_config.json`
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/<your-username>/bookmyshow-mcp-webscraper.git",
+        "git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git",
         "mcp_server.py"
       ]
     }
