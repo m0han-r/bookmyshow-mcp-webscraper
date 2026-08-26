@@ -20,8 +20,9 @@ app = FastAPI(
     ),
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc",
+    redoc_url=None,
 )
+
 
 # CORS Configuration
 app.add_middleware(

@@ -17,7 +17,8 @@ A high-performance Python web scraper, RESTful API server, Model Context Protoco
 - 🎟️ **Real-Time Showtimes & Pricing**: Extract cinema venues, showtimes, screen formats (2D, 3D, IMAX, 4DX), ticket price ranges, and seat availability status (`AVAILABLE`, `FAST_FILLING`, `SOLD_OUT`).
 - 🎬 **Comprehensive Movie Metadata**: Detailed synopsis, cast & crew profiles, censor ratings, languages, genres, poster/banner images, and trailer video links.
 - ⚡ **Sync & Async Python API**: Built-in support for both synchronous and asynchronous Python code (`asyncio`) with response caching (5-minute default TTL).
-- 🚀 **FastAPI REST API**: Fully interactive Swagger (`/docs`) & ReDoc (`/redoc`) API endpoints for seamless web and mobile backend integration.
+- 🚀 **FastAPI REST API**: Fully interactive Swagger (`/docs`) API endpoints for seamless web and mobile backend integration.
+
 - 💻 **Rich CLI Interface**: Sleek terminal UI powered by `rich` supporting search, listings, details, and automatic exports.
 - 📊 **Multi-Format Data Exporter**: Export scraped data directly to **JSON**, **CSV**, or **Excel (`.xlsx`)** files.
 - 🌐 **Web Dashboard UI**: Embedded frontend dashboard to visually explore active movies, events, and showtimes.
@@ -63,10 +64,11 @@ python --version
 
 ### 2. Install Dependencies
 
-Install the required Python libraries:
+Install the required Python packages:
 ```bash
-pip install fastapi uvicorn requests pydantic pandas openpyxl rich mcp pytest
+pip install -r requirements.txt
 ```
+
 
 ---
 
@@ -165,9 +167,9 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 - **Interactive API Docs (Swagger UI)**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc Documentation**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 - **Web Dashboard**: [http://localhost:8000/](http://localhost:8000/)
 - **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
+
 
 ---
 
