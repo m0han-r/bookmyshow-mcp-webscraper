@@ -1,4 +1,5 @@
-# BookMyShow Scraper — REST API & MCP Tools Reference
+# BookMyShow MCP Webscraper — REST API & MCP Tools Reference
+
 
 This document provides reusable, clear titles, detailed descriptions, parameter specifications, and sample payloads for all 7 REST API Endpoints and Model Context Protocol (MCP) Tools.
 

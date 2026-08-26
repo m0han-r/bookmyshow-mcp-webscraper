@@ -3,10 +3,11 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bookmyshow-webscraper"
+name = "bookmyshow-mcp-webscraper"
 version = "1.0.0"
 description = "A high-performance Python web scraper, RESTful API server, and Model Context Protocol (MCP) server for BookMyShow."
 readme = "README.md"
+
 authors = [{ name = "Mohan R" }]
 license = { text = "MIT" }
 keywords = ["bookmyshow", "scraper", "mcp", "fastapi", "python", "movies", "showtimes"]

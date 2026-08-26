@@ -13,7 +13,7 @@ from bms_scraper.routers import router as api_router
 from bms_scraper.config import CONFIG
 
 app = FastAPI(
-    title="BookMyShow Scraper RESTful API",
+    title="BookMyShow MCP Webscraper RESTful API",
     description=(
         "A high-performance RESTful API for scraping BookMyShow (https://in.bookmyshow.com). "
         "Returns clean, formatted, strictly-typed JSON containing only essential, useful data."
@@ -53,10 +53,11 @@ async def root():
 async def health_check():
     return {
         "status": "healthy",
-        "service": "bookmyshow-scraper-api",
+        "service": "bookmyshow-mcp-webscraper-api",
         "version": "1.0.0",
         "target": CONFIG.BASE_URL,
     }
+
 
 
 if __name__ == "__main__":

@@ -16,8 +16,9 @@ except (ImportError, ModuleNotFoundError):
 from .scraper import BookMyShowScraper
 
 # Initialize FastMCP / MCPServer Instance
-mcp = FastMCP("BookMyShow Scraper")
+mcp = FastMCP("BookMyShow MCP Webscraper")
 scraper = BookMyShowScraper()
+
 
 
 @mcp.tool()

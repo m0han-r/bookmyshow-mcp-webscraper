@@ -1,4 +1,4 @@
-# 🎬 BookMyShow Web Scraper & REST API
+# 🎬 BookMyShow MCP Webscraper
 
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688.svg)](https://fastapi.tiangolo.com/)
@@ -27,7 +27,7 @@ A high-performance Python web scraper, RESTful API server, Model Context Protoco
 ## 📁 Project Structure
 
 ```
-bookmyshow-webscraper/
+bookmyshow-mcp-webscraper/
 ├── bms_scraper/             # Core Python Package
 │   ├── __init__.py          # Package exports & versioning
 │   ├── cli.py               # Command Line Interface (rich + argparse)
@@ -97,7 +97,7 @@ Run the server over stdio:
 python mcp_server.py
 
 # Or using uvx directly from Git repository:
-uvx --from git+https://github.com/<your-username>/bookmyshow-webscraper.git mcp_server.py
+uvx --from git+https://github.com/<your-username>/bookmyshow-mcp-webscraper.git mcp_server.py
 ```
 
 ### Recommended MCP Client Configuration (`uvx`)
@@ -111,7 +111,7 @@ Add Option A to your MCP client configuration file (`claude_desktop_config.json`
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/<your-username>/bookmyshow-webscraper.git",
+        "git+https://github.com/<your-username>/bookmyshow-mcp-webscraper.git",
         "mcp_server.py"
       ]
     }
@@ -144,6 +144,7 @@ Add Option A to your MCP client configuration file (`claude_desktop_config.json`
 }
 ```
 </details>
+
 
 
 
