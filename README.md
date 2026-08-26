@@ -18,7 +18,7 @@ It packages everything into a **FastAPI REST server**, **MCP tools** (for AI ass
 - **Fetches Showtimes & Pricing**: Pulls cinema showtimes, screen formats (2D, 3D, IMAX, 4DX), ticket price ranges (in ₹), and seat availability.
 - **Extracts Venue Locations & Lat/Long**: Pulls theater street addresses, exact latitude and longitude coordinates, and venue amenities (parking, food court, M-ticket entry).
 - **Gets Movie Synopsis & Trailers**: Retrieves plot summaries, cast and crew info, ratings, posters, and YouTube trailer links.
-- **Runs as an MCP Server**: Works out-of-the-box with AI tools (Claude Desktop, Cursor, Antigravity) via `mcp_server.py` or `uvx`.
+- **Runs as an MCP Server**: Works out-of-the-box with AI tools (Claude Desktop, Cursor, Antigravity) via `bms-mcp` (or `mcp_server.py` locally).
 - **FastAPI REST Server**: Interactive Swagger API docs (`/docs`).
 - **Terminal CLI**: Terminal interface for search, listings, and exports.
 - **Exports to Files**: Exports scraped data to JSON, CSV, or Excel (`.xlsx`).
@@ -81,7 +81,13 @@ python main.py
 
 ## 🤖 MCP Server Setup
 
-Connect your AI assistant (Claude Desktop, Cursor, Antigravity) using `uvx`:
+Connect your AI assistant (Claude Desktop, Cursor, Antigravity) using `uvx`. `uvx` automatically fetches the package from GitHub and executes the `bms-mcp` script entry point registered in `pyproject.toml`.
+
+<details>
+<summary><b>🪟 Windows (PowerShell / Command Prompt)</b></summary>
+
+### Claude Desktop / Cursor / Antigravity Configuration
+Add to your `%APPDATA%\Claude\claude_desktop_config.json` (or `.cursor/mcp.json`):
 
 ```json
 {
@@ -91,17 +97,92 @@ Connect your AI assistant (Claude Desktop, Cursor, Antigravity) using `uvx`:
       "args": [
         "--from",
         "git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git",
-        "mcp_server.py"
+        "bms-mcp"
       ]
     }
   }
 }
 ```
 
-Or run locally over stdio:
+### Direct Terminal Execution
+Run natively in PowerShell or Command Prompt (uv generates and runs `bms-mcp.exe` wrappers on Windows):
+
+```powershell
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-mcp
+```
+
+</details>
+
+<details>
+<summary><b>🐧 Linux</b></summary>
+
+### Claude Desktop / Cursor / Antigravity Configuration
+Add to your `~/.config/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "bookmyshow": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git",
+        "bms-mcp"
+      ]
+    }
+  }
+}
+```
+
+### Direct Terminal Execution
+Run directly in Linux Terminal:
+
+```bash
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-mcp
+```
+
+</details>
+
+<details>
+<summary><b>🍎 macOS</b></summary>
+
+### Claude Desktop / Cursor / Antigravity Configuration
+Add to your `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "bookmyshow": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git",
+        "bms-mcp"
+      ]
+    }
+  }
+}
+```
+
+### Direct Terminal Execution
+Run directly in macOS Terminal / zsh:
+
+```zsh
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-mcp
+```
+
+</details>
+
+<details>
+<summary><b>🐍 Local stdio Execution</b></summary>
+
+If you have cloned the repository locally:
+
 ```bash
 python mcp_server.py
 ```
+
+</details>
 
 ---
 
@@ -127,6 +208,37 @@ showtimes = scraper.get_showtimes(movie_code_or_url="ET00378770", city="mumbai")
 
 ## 💻 CLI Usage
 
+Execute the CLI directly via `uvx` without installing dependencies, or locally via Python:
+
+<details>
+<summary><b>🪟 Windows (PowerShell / Command Prompt)</b></summary>
+
+```powershell
+# List popular cities via uvx
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli cities --popular
+
+# Scrape movies in Bengaluru and export to Excel
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli movies --city bengaluru --language Hindi --export xlsx
+```
+
+</details>
+
+<details>
+<summary><b>🐧 Linux & 🍎 macOS</b></summary>
+
+```bash
+# List popular cities via uvx
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli cities --popular
+
+# Scrape movies in Bengaluru and export to Excel
+uvx --from git+https://github.com/m0han-r/bookmyshow-mcp-webscraper.git bms-cli movies --city bengaluru --language Hindi --export xlsx
+```
+
+</details>
+
+<details>
+<summary><b>🐍 Local Python Execution</b></summary>
+
 ```bash
 # List popular cities
 python -m bms_scraper.cli cities --popular
@@ -134,6 +246,8 @@ python -m bms_scraper.cli cities --popular
 # Scrape movies in Bengaluru and export to Excel
 python -m bms_scraper.cli movies --city bengaluru --language Hindi --export xlsx
 ```
+
+</details>
 
 ---
 
