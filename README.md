@@ -16,9 +16,9 @@ A high-performance Python web scraper, RESTful API server, Model Context Protoco
 - 🏙️ **Multi-City & Region Support**: Fetch movies, events, and venues across all supported Indian cities (Mumbai, Delhi-NCR, Bengaluru, Hyderabad, Chennai, Pune, etc.).
 - 🎟️ **Real-Time Showtimes & Pricing**: Extract cinema venues, showtimes, screen formats (2D, 3D, IMAX, 4DX), ticket price ranges, and seat availability status (`AVAILABLE`, `FAST_FILLING`, `SOLD_OUT`).
 - 🎬 **Comprehensive Movie Metadata**: Detailed synopsis, cast & crew profiles, censor ratings, languages, genres, poster/banner images, and trailer video links.
+- 📍 **Venue Geo Coordinates**: Extract cinema hall street addresses, exact latitude, longitude, and available amenities.
 - ⚡ **Sync & Async Python API**: Built-in support for both synchronous and asynchronous Python code (`asyncio`) with response caching (5-minute default TTL).
 - 🚀 **FastAPI REST API**: Fully interactive Swagger (`/docs`) API endpoints for seamless web and mobile backend integration.
-
 - 💻 **Rich CLI Interface**: Sleek terminal UI powered by `rich` supporting search, listings, details, and automatic exports.
 - 📊 **Multi-Format Data Exporter**: Export scraped data directly to **JSON**, **CSV**, or **Excel (`.xlsx`)** files.
 - 🌐 **Web Dashboard UI**: Embedded frontend dashboard to visually explore active movies, events, and showtimes.
@@ -45,7 +45,6 @@ bookmyshow-mcp-webscraper/
 │   ├── test_api.py          # FastAPI endpoint integration tests
 │   ├── test_mcp.py          # MCP server tool tests
 │   └── test_scraper.py      # Parser and Scraper unit tests
-├── API_AND_MCP_REFERENCE.md # Complete API & MCP specification & cheatsheet
 ├── main.py                  # FastAPI server entry point
 ├── mcp_server.py            # MCP server entry point script
 └── README.md                # Documentation
@@ -69,15 +68,13 @@ Install the required Python packages:
 pip install -r requirements.txt
 ```
 
-
-
 ---
 
 ## 🤖 Model Context Protocol (MCP) Server
 
 Connect your AI assistant (Claude Desktop, Antigravity IDE, Cursor, etc.) directly to BookMyShow web scraping tools using the Model Context Protocol.
 
-### Registered MCP Tools
+### Registered MCP Tools Summary
 
 | Tool | Parameters | Description |
 | :--- | :--- | :--- |
@@ -88,8 +85,6 @@ Connect your AI assistant (Claude Desktop, Antigravity IDE, Cursor, etc.) direct
 | `bms_get_showtimes` | `movie_code, city, date` | Returns cinema halls, showtimes, screen formats (IMAX/3D/4DX), prices & seat availability |
 | `bms_get_venue_details` | `venue_code, city` | Returns cinema venue street address, exact latitude, longitude, and facilities |
 | `bms_search` | `query, city` | Searches active movies and live events matching search query |
-
-> 📖 **Full API & MCP Reference**: See [`API_AND_MCP_REFERENCE.md`](file:///d:/Workspace/MyProjects/bookmyshow-webscraper/API_AND_MCP_REFERENCE.md) for parameter details and sample JSON responses.
 
 ### Test MCP Server Directly
 
@@ -148,9 +143,6 @@ Add Option A to your MCP client configuration file (`claude_desktop_config.json`
 ```
 </details>
 
-
-
-
 ---
 
 ## 🌐 Running the REST API Server
@@ -171,20 +163,110 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8000
 - **Web Dashboard**: [http://localhost:8000/](http://localhost:8000/)
 - **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
 
+---
+
+## 🔌 Complete API & MCP Tools Detailed Reference
 
 ---
 
-## 🔌 REST API Endpoints (`/api/v1`)
+### 1. Get Supported Cities & Regions
+- **Title**: Get Supported Cities & Regions
+- **Description**: Returns all supported regions and major popular cities across India on BookMyShow (Mumbai, Delhi-NCR, Bengaluru, Hyderabad, Chennai, Pune, Kolkata, etc.) with region codes and URL slugs.
+- **REST API**: `GET /api/v1/cities`
+- **MCP Tool**: `bms_get_cities(popular_only: bool = False)`
+- **Parameters**: `popular_only` *(boolean, optional)*: Filter for top popular cities.
+- **Examples**:
+  - cURL: `curl -X GET "http://127.0.0.1:8000/api/v1/cities?popular_only=true"`
+  - MCP: `{"tool": "bms_get_cities", "arguments": {"popular_only": true}}`
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/cities` | List supported regions and popular cities |
-| `GET` | `/api/v1/movies` | Get active movies in a city (filter by language/genre) |
-| `GET` | `/api/v1/events` | Get events, comedy shows, music concerts, sports |
-| `GET` | `/api/v1/movies/{movie_code}` | Get detailed movie metadata, cast, crew & synopsis |
-| `GET` | `/api/v1/showtimes` | Get cinema venues, showtimes, pricing & formats |
-| `GET` | `/api/v1/venues/{venue_code}` | Get cinema venue street address, latitude, longitude & facilities |
-| `GET` | `/api/v1/search` | Search movies & events by query term |
+---
+
+### 2. Get Active Movie Listings
+- **Title**: Get Active Movie Listings in a City
+- **Description**: Retrieves clean, structured movie listings currently showing or coming soon in a selected city, with optional filtering by audio language and genre.
+- **REST API**: `GET /api/v1/movies`
+- **MCP Tool**: `bms_get_movies(city: str = "mumbai", language: Optional[str] = None, genre: Optional[str] = None)`
+- **Parameters**: `city` *(string)*, `language` *(string, optional)*, `genre` *(string, optional)*.
+- **Examples**:
+  - cURL: `curl -X GET "http://127.0.0.1:8000/api/v1/movies?city=chennai&language=Tamil"`
+  - MCP: `{"tool": "bms_get_movies", "arguments": {"city": "chennai", "language": "Tamil"}}`
+
+---
+
+### 3. Get Live Events & Shows
+- **Title**: Get Live Events & Shows in a City
+- **Description**: Retrieves active live events, comedy standup shows, music concerts, sports matches, exhibitions, and workshops in a target city.
+- **REST API**: `GET /api/v1/events`
+- **MCP Tool**: `bms_get_events(city: str = "mumbai", category: Optional[str] = None)`
+- **Parameters**: `city` *(string)*, `category` *(events, comedy-shows, music-shows, sports)*.
+- **Examples**:
+  - cURL: `curl -X GET "http://127.0.0.1:8000/api/v1/events?city=bengaluru&category=comedy-shows"`
+  - MCP: `{"tool": "bms_get_events", "arguments": {"city": "bengaluru", "category": "comedy-shows"}}`
+
+---
+
+### 4. Get Movie Synopsis & Metadata
+- **Title**: Get Movie Synopsis & Metadata
+- **Description**: Retrieves comprehensive movie metadata including full plot synopsis, duration, censor certification, ratings, audio languages, poster and banner URLs, cast/crew profiles, and YouTube trailer links.
+- **REST API**: `GET /api/v1/movies/{movie_code}`
+- **MCP Tool**: `bms_get_movie_details(movie_code: str, city: str = "mumbai")`
+- **Parameters**: `movie_code` *(string, e.g. ET00378770)*, `city` *(string)*.
+- **Examples**:
+  - cURL: `curl -X GET "http://127.0.0.1:8000/api/v1/movies/ET00378770?city=mumbai"`
+  - MCP: `{"tool": "bms_get_movie_details", "arguments": {"movie_code": "ET00378770", "city": "mumbai"}}`
+
+---
+
+### 5. Get Cinema Venues & Showtimes
+- **Title**: Get Cinema Venues & Showtimes
+- **Description**: Retrieves all cinema halls showing a specific movie in a city, including showtimes, screen formats (2D, 3D, IMAX 3D, 4DX), price ranges in ₹, M-ticket support, and seat availability.
+- **REST API**: `GET /api/v1/showtimes`
+- **MCP Tool**: `bms_get_showtimes(movie_code: str, city: str = "mumbai", date: Optional[str] = None)`
+- **Parameters**: `movie_code` *(string)*, `city` *(string)*, `date` *(YYYYMMDD, optional)*.
+- **Examples**:
+  - cURL: `curl -X GET "http://127.0.0.1:8000/api/v1/showtimes?movie_code=ET00378770&city=chennai"`
+  - MCP: `{"tool": "bms_get_showtimes", "arguments": {"movie_code": "ET00378770", "city": "chennai"}}`
+
+---
+
+### 6. Get Cinema Venue Location & Geo Coordinates
+- **Title**: Get Cinema Venue Location & Geo Coordinates
+- **Description**: Retrieves detailed cinema hall metadata including full street address, landmark, postal code, exact latitude and longitude coordinates, and available venue amenities.
+- **REST API**: `GET /api/v1/venues/{venue_code}`
+- **MCP Tool**: `bms_get_venue_details(venue_code: str, city: str = "mumbai")`
+- **Parameters**: `venue_code` *(string, e.g. PCAN, CSWO)*, `city` *(string)*.
+- **Examples**:
+  - cURL: `curl -X GET "http://127.0.0.1:8000/api/v1/venues/PCAN?city=chennai"`
+  - MCP: `{"tool": "bms_get_venue_details", "arguments": {"venue_code": "PCAN", "city": "chennai"}}`
+
+#### Example Response
+```json
+{
+  "success": true,
+  "count": 1,
+  "data": {
+    "venue_code": "PCAN",
+    "venue_name": "PVR: VR Chennai, Anna Nagar",
+    "address": "3rd Floor, VR Mall, Metro Zone, No 44, Pillaiyar Koil Street, Jawaharlal Nehru Road, Anna Nagar, Chennai, Tamil Nadu 600040, India",
+    "latitude": 13.082561,
+    "longitude": 80.194803,
+    "facilities": ["Ticket Cancellation", "F&B", "MTicket", "Parking Facility", "Food Court"]
+  },
+  "error": null
+}
+```
+
+---
+
+### 7. Search Movies & Live Events
+- **Title**: Search Movies & Live Events
+- **Description**: Performs a cross-search across active movie titles and live event listings in a selected city matching a query search term.
+- **REST API**: `GET /api/v1/search`
+- **MCP Tool**: `bms_search(query: str, city: str = "mumbai")`
+- **Parameters**: `query` *(string)*, `city` *(string)*.
+- **Examples**:
+  - cURL: `curl -X GET "http://127.0.0.1:8000/api/v1/search?q=Toxic&city=mumbai"`
+  - MCP: `{"tool": "bms_search", "arguments": {"query": "Toxic", "city": "mumbai"}}`
 
 ---
 
@@ -298,7 +380,6 @@ tests\test_scraper.py ....                                               [100%]
 
 ============================= 17 passed in 8.15s ==============================
 ```
-
 
 ---
 
